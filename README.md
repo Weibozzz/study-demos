@@ -59,7 +59,7 @@ npm start
 
 向文章的作者提供小额捐助，可以鼓励作者写出更好的文章。这是一种良性循环，现在就行动吧！
 
-[![立即捐助](https://weibozzz.github.io/assets/pay-btn.png)](https://github.com/Weibozzz/study-demos/issues/1)
+[![立即捐助](https://weibozzz.github.io/assets/pay/pay-btn.png)](https://github.com/Weibozzz/study-demos/issues/1)
 
 
 （支持微信与支付宝）
