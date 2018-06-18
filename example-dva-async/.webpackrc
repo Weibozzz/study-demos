@@ -1,0 +1,9 @@
+{
+  "proxy": {
+    "/api": {
+      "target": "http://www.liuweibo.cn/",
+      "changeOrigin": true,
+      "pathRewrite": { "^/api" : "" }
+    }
+  }
+}

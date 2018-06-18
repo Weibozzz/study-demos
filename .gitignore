@@ -12,6 +12,7 @@
 # misc
 .DS_Store
 .idea/
+_book
 .env.local
 .env.development.local
 .env.test.local
