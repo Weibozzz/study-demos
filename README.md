@@ -2,7 +2,7 @@
 ## koa2-router-demo
 展示了koa2-router get和post传参遇到的坑和demo
 
-```
+```bash
 cd koa2-router-demo
 cnpm i 
 npm start
@@ -11,7 +11,7 @@ npm start
 ```
 ## redux-todolist-demo
 展示了redux和官方todulist异步的demo
-```
+```bash
 cd redux-todolist-demo
 cnpm i 
 npm start
@@ -21,7 +21,7 @@ npm start
 
 ## react-redux-router-no-hash
 展示了redux和react结合起来没有带#号的问题
-```
+```bash
 cd react-redux-router-no-hash
 cnpm i 
 npm start
@@ -30,7 +30,7 @@ npm start
 ```
 ## antd-theme
 展示了antd和create-react-app修改默认端口和主题颜色
-```
+```bash
 cd antd-theme
 cnpm i 
 npm start
@@ -39,7 +39,7 @@ npm start
 ```
 ## example-dva-async
 展示了dva-cli处理同异步
-```
+```bash
 cd example-dva-async
 cnpm i 
 npm start
@@ -47,6 +47,17 @@ npm start
 
 ```
 
+
+## next-demo
+结合redux和next.js服务端渲染简单demo，异步获取数据，开启gizp
+```bash
+cd next-demo
+cnpm i 
+npm run build
+npm run start
+
+
+```
 ## 关于作者 / About
 
 - github:[https://github.com/Weibozzz](https://github.com/Weibozzz)
