@@ -1,6 +1,17 @@
 ## next-demo
 结合redux和next.js服务端渲染简单demo，异步获取数据，开启gizp
 
+### 运行
+```bash
+cnpm i 
+npm build
+npm run dev
+//部署
+npm run build 
+npm start
+
+
+```
 ### 开启gzip
 ```js
 const compression = require('compression')
