@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CSS3自定义属性实现换肤功能</title>
+  <style type="text/css">
+    :root{
+      --theme-color:#989898;
+    }
+
+    #header{
+      width: 100%;
+      height: 50px;
+      line-height: 50px;
+      background-color: var(--theme-color);
+      margin-bottom: 30px;
+    }
+    #header h1{
+      color: #fff;
+    }
+    button{
+      width: 100px;
+      height: 30px;
+      color: #fff;
+      border:none;
+    }
+    #btn-red{
+      --btn-red:red;
+      background-color: var(--btn-red)
+    }
+    #btn-black{
+      --btn-black:black;
+      background-color: var(--btn-black)
+    }
+    #btn-blue{
+      --btn-blue:blue;
+      background-color: var(--btn-blue)
+    }
+  </style>
+</head>
+<body>
+<header id="header">
+  <h1>CSS3自定义属性实现换肤功能Demo</h1>
+</header>
+
+<div>
+  <button id="btn-red">red</button>
+  <button id="btn-black">black</button>
+  <button id="btn-blue">blue</button>
+</div>
+
+<script type="text/javascript">
+  var btns = document.getElementsByTagName("button");
+  for(var i=0;i<btns.length;i++){
+    btns[i].addEventListener("click",function(e){
+      fn(e)
+    })
+  }
+  function fn (e) {
+    var ele = e.target;
+    var styles = getComputedStyle(ele);
+    var value = styles.getPropertyValue("--"+ele.id);
+    document.documentElement.style.setProperty("--theme-color",value);
+  }
+
+</script>
+</body>
+</html>

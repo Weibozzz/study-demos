@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>利用less实现换肤</title>
+  <link rel="stylesheet/less" href="index.less">
+</head>
+<body class="style0">
+<h2>利用less实现换肤</h2>
+<button class="style0">style0</button>
+<button class="style1">style1</button>
+<button class="style2">style2</button>
+<script src="https://cdn.bootcss.com/less.js/3.9.0/less.min.js"></script>
+<script>
+  var btns = document.getElementsByTagName("button");
+  for(var i=0;i<btns.length;i++){
+    btns[i].addEventListener("click",function(e){
+      fn(e)
+    })
+  }
+  function fn (e) {
+    document.body.className = e.target.className
+  }
+</script>
+</body>
+</html>
