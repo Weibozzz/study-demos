@@ -60,6 +60,10 @@ npm run start
 ```
 ## react-hooks
 react-hooks基础
+## theme-change
+前端换肤实现
+- css3-var [css3 变量实现换肤](https://weibozzz.github.io/study-demos/theme-change/css3-var/index.html)
+- less [实现换肤](https://weibozzz.github.io/study-demos/theme-change/less/index.html)
 ## 关于作者 / About
 
 - github:[https://github.com/Weibozzz](https://github.com/Weibozzz)
