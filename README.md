@@ -67,10 +67,16 @@ react-hooks基础
 ## threejs-demo
 一些demo展示
 ### lines
+[threejs-lines](https://weibozzz.github.io/study-demos/threejs-demo/lines.html)
+
 ![](./threejs-demo/images/lines.gif)
 ### audio-view
+[threejs-audio1](https://weibozzz.github.io/study-demos/threejs-demo/audio-view.html)
+
 ![](./threejs-demo/images/audio.gif)
 ### audio-view2
+[threejs-audio2](https://weibozzz.github.io/study-demos/threejs-demo/audio-view2.html)
+
 ![](./threejs-demo/images/audio2.gif)
 ## 关于作者 / About
 
