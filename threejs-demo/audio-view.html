@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="HTML5 Audio Spectrum Visualizer">
+  <title>HTML5 3D Audio visualizer Built with ThreeJS</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+<button id="startButton">开始播放</button>
+<script type="module">
+  import * as THREE from 'https://cdn.jsdelivr.net/gh/mrdoob/three.js/build/three.module.js'
+  import { OrbitControls } from 'https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/jsm/controls/OrbitControls.js'
+  import Stats from 'https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/jsm/libs/stats.module.js'
+  import { GUI } from 'https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/jsm/libs/dat.gui.module.js'
+  let url = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/'
+  let spotLight,
+    scene,
+    analyser,
+    audio,
+    renderer,
+    camera,
+    capGroup,
+    cubeGroup,
+    stats,
+    startButton,
+    capMeshMaterial,
+    cubeMeshMaterial,
+    controls,
+    clock
+  const width = window.innerWidth //窗口宽度
+  const height = window.innerHeight //窗口高度
+  const n = 30 // 立方体个数
+  class Visualizer {
+    constructor () {
+      // this.spotLight = ''
+      // this.scene = ''
+      // this.analyser = ''
+      // this.audio = ''
+      // this.renderer = ''
+      // this.camera = ''
+      // this.capGroup = ''
+      // this.cubeGroup = ''
+      // this.stats = ''
+      // this.startButton = ''
+      // this.capMeshMaterial = ''
+      // this.cubeMeshMaterial = ''
+    }
+    init () {
+      startButton.style.display = 'none'
+      scene = new THREE.Scene()
+      // 创建多个立方体
+      this.cube()
+      // 创建平面
+      this.plane()
+      // 插入灯光
+      this.light()
+      // 插入辅助线
+      // this.helper()
+      // 放入相机
+      this.camera()
+      // 加入音频
+      this.audio()
+      // 开始渲染
+      this.renderer()
+      // 加入鼠标控制
+      this.controls()
+      // 开始循环
+      this.renderAnimation()
+      // gui 面板
+      this.buildGui()
+      // 刷新频率
+      this.initStats()
+      window.addEventListener('resize', onWindowResize)
+    }
+    cube () {
+      const BoxGeometry = new THREE.BoxGeometry(2, 2, 5)
+      capMeshMaterial = new THREE.MeshPhongMaterial({
+        color: '#01FF00'
+      })
+      const cubeGeometry = new THREE.BoxGeometry(2, 0.8, 5)
+      cubeMeshMaterial = new THREE.MeshPhongMaterial({
+        color: '#fff'
+      })
+      capGroup = new THREE.Group()
+      cubeGroup = new THREE.Group()
+      for (let i = 0; i < n; i++) {
+        const meshCap = new THREE.Mesh(BoxGeometry, capMeshMaterial)
+        const h = 5
+        const gap = 2
+        const w = i * h + gap
+        meshCap.position.setX(w)
+        meshCap.translateX(-h * n / 2)
+        // meshCap.scale.setY(5)
+        meshCap.name = `cap${i}`
+        capGroup.add(meshCap)
+        const meshCube = new THREE.Mesh(cubeGeometry, cubeMeshMaterial)
+        meshCube.position.setX(w)
+        meshCube.translateX(-h * n / 2)
+        // meshCap.scale.setY(5)
+        meshCube.name = `cube${i}`
+        cubeGroup.add(meshCube)
+      }
+      // meshCap.translateX(-w * 15)
+      // capGroup.translateX(-)
+      scene.add(capGroup)
+      scene.add(cubeGroup)
+    }
+    plane () {
+      const planeGeometry = new THREE.PlaneGeometry(500, 500)
+      const material = new THREE.MeshPhongMaterial({
+        color: 0x222222,
+        ambient: 0x555555,
+        specular: 0xdddddd,
+        shininess: 5,
+        reflectivity: 2
+      })
+      material.side = THREE.DoubleSide
+      const plane = new THREE.Mesh(planeGeometry, material)
+      plane.rotation.x = -0.5 * Math.PI
+      plane.position.x = 15
+      plane.position.y = 0
+      plane.position.z = 0
+      plane.receiveShadow = true
+      scene.add(plane)
+    }
+    light () {
+      // 点光 环境光 方向光
+      spotLight = new THREE.SpotLight('#fff')
+      spotLight.position.set(0, 50, 0)
+      // spotLight.angle = Math.PI / 4;
+      spotLight.penumbra = 0.5
+      spotLight.decay = 2
+      spotLight.distance = 200
+      scene.add(spotLight)
+      const ambientLight = new THREE.AmbientLight('#0c0c0c')
+      scene.add(ambientLight)
+      const directionalLight = new THREE.DirectionalLight('#fff', 0.7)
+      directionalLight.castShadow = true
+      directionalLight.position.set(0, 2, 5)
+      scene.add(directionalLight)
+    }
+    helper () {
+      const spotLightHelper = new THREE.SpotLightHelper(spotLight)
+      const AxesHelper = new THREE.AxesHelper(50)
+      scene.add(AxesHelper)
+      scene.add(spotLightHelper)
+    }
+    /**
+     * 相机设置
+     */
+    camera () {
+      const k = width / height //窗口宽高比
+      const s = 150 //三维场景显示范围控制系数，系数越大，显示的范围越大
+      //创建相机对象
+      camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000)
+      camera.position.x = 0
+      camera.position.y = 10
+      camera.position.z = 200
+      camera.lookAt(scene.position) //设置相机方向(指向的场景对象)
+    }
+    audio () {
+      const listener = new THREE.AudioListener() //监听者
+      audio = new THREE.Audio(listener) //非位置音频对象
+      const audioLoader = new THREE.AudioLoader() //音频加载器
+      camera.add(listener)
+      // 也可为网络资源 mp3
+      audioLoader.load(url + '/sounds/358232_j_s_song.mp3', function (buffer) {
+        audio.setBuffer(buffer) // 音频缓冲区对象关联到音频对象audio
+        audio.setLoop(true) //是否循环
+        audio.setVolume(0.5) //音量
+        audio.play() //播放
+        // 音频分析器和音频绑定，可以实时采集音频时域数据进行快速傅里叶变换
+      })
+      analyser = new THREE.AudioAnalyser(audio, 128)
+    }
+    /**
+     * 创建渲染器对象
+     */
+    renderer () {
+      renderer = new THREE.WebGLRenderer({ antialias: true })
+      renderer.setSize(width, height) //设置渲染区域尺寸
+      renderer.setClearColor('#212121', 1) //设置背景颜色
+      document.body.appendChild(renderer.domElement) //body元素中插入canvas对象
+    }
+    controls () {
+      //创建控件对象  相机对象camera作为参数   控件可以监听鼠标的变化，改变相机对象的属性
+      controls = new OrbitControls(camera, renderer.domElement)
+      controls.minDistance = 100
+      controls.maxDistance = 300
+      controls.maxPolarAngle = 0.4 * Math.PI
+      //监听鼠标事件，触发渲染函数，更新canvas画布渲染效果
+      controls.addEventListener('change', this.render)
+    }
+    renderAnimation () {
+      // for(let i = -15; i < 15; i++){
+      //   const meter = scene.getObjectByName(`cap${i}`)
+      //   const meter2 = scene.getObjectByName(`cube${i}`)
+      //   const gap = Math.random() * 20
+      //   meter.scale.y = gap;
+      //   meter2.position.y = gap + 2;
+      // }
+      this.render()
+      requestAnimationFrame(this.renderAnimation.bind(this))
+    }
+    render () {
+      // renderAnimation()
+      renderer.render(scene, camera) //执行渲染操作
+      stats && stats.update()
+      if (analyser) {
+        // getAverageFrequency()返回平均音频
+        // const frequency = analyser.getAverageFrequency();
+        const arr = analyser.getFrequencyData()
+        // 这里只取了 n(30) 个数据
+        capGroup.children.forEach((mesh, index) => {
+          mesh.scale.y = arr[index] / 10
+          mesh.material.color.r = arr[index] / 10
+        })
+        cubeGroup.children.forEach((mesh, index) => {
+          mesh.position.y = arr[index] / 10 + 1
+          mesh.material.color.g = arr[index] / 10
+        })
+      }
+    }
+    buildGui () {
+      const gui = new GUI()
+      const params = {
+        'light color': spotLight.color.getHex(),
+        'capColor': capMeshMaterial.color.getHex(),
+        'cubeColor': cubeMeshMaterial.color.getHex(),
+        intensity: spotLight.intensity,
+        distance: spotLight.distance,
+        angle: spotLight.angle,
+        penumbra: spotLight.penumbra,
+        decay: spotLight.decay,
+        focus: spotLight.shadow.focus
+      }
+      gui.addColor(params, 'light color')
+        .onChange((val) => {
+          spotLight.color.setHex(val)
+          this.render()
+        })
+      gui.addColor(params, 'capColor')
+        .onChange((val) => {
+          capMeshMaterial.color.setHex(val)
+          this.render()
+        })
+      gui.addColor(params, 'cubeColor')
+        .onChange((val) => {
+          cubeMeshMaterial.color.setHex(val)
+          this.render()
+        })
+      gui.add(params, 'intensity', 0, 2)
+        .onChange((val) => {
+          spotLight.intensity = val
+          this.render()
+        })
+      gui.add(params, 'distance', 50, 200)
+        .onChange((val) => {
+          spotLight.distance = val
+          this.render()
+        })
+      gui.add(params, 'angle', 0, Math.PI / 3)
+        .onChange((val) => {
+          spotLight.angle = val
+          this.render()
+        })
+      gui.add(params, 'penumbra', 0, 1)
+        .onChange((val) => {
+          spotLight.penumbra = val
+          this.render()
+        })
+      gui.add(params, 'decay', 1, 2)
+        .onChange((val) => {
+          spotLight.decay = val
+          this.render()
+        })
+      gui.add(params, 'focus', 0, 1)
+        .onChange((val) => {
+          spotLight.shadow.focus = val
+          this.render()
+        })
+      gui.open()
+    }
+    initStats () {
+      stats = new Stats()
+      stats.domElement.style.position = 'fixed'
+      stats.domElement.style.right = '0px'
+      stats.domElement.style.left = 'auto'
+      stats.domElement.style.top = 'auto'
+      stats.domElement.style.bottom = '0px'
+      document.body.appendChild(stats.domElement)
+    }
+  }
+  const visualizer = new Visualizer()
+  startButton = document.getElementById('startButton')
+  startButton.addEventListener('click', () => {
+    visualizer.init()
+  })
+  function onWindowResize () {
+    camera.aspect = window.innerWidth / window.innerHeight
+    camera.updateProjectionMatrix()
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    visualizer.render()
+  }
+</script>
+</body>
+</html>
